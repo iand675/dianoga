@@ -22,7 +22,7 @@ module Dianoga.Minification.JavaScript.ClosureCompiler
 
 import Data.List
 import Development.Shake
-import Development.Shake.Command
+import Paths_dianoga
 
 data Env = Browser | Custom
   deriving (Show, Eq)
@@ -381,7 +381,9 @@ instance AsArgList Bool where
   build str toggle = if toggle then [str] else []
 
 closureCompile :: CmdResult a => [CmdOption] -> ClosureCompilerOptions -> Action a
-closureCompile opts = command opts "closure-compiler" . compilerArgs
+closureCompile opts args = do
+  jarPath <- liftIO $ getDataFileName "external/closure-compiler/compiler.jar"
+  command opts "java" . (["-jar", jarPath] ++) $ compilerArgs args
 
 compilerArgs :: ClosureCompilerOptions -> [String]
 compilerArgs x = concat
