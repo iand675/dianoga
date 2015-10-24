@@ -121,9 +121,11 @@ dependenciesAccumulator = Fold handleTag startState finalize
         case name of
           "img" -> state.imageFiles %= (\srcs -> maybe srcs (: srcs) $ lookup "src" attrs)
 
-          "link" -> state.cssFiles %= (\srcs -> maybe srcs (: srcs) $ do
-            "stylesheet" <- lookup "rel" attrs
-            lookup "href" attrs)
+          "link" -> state.cssFiles %= (\srcs -> maybe srcs (: srcs) $ case lookup "rel" attrs of
+            -- Default link type is equivalent to setting rel=stylesheet
+            Nothing -> lookup "href" attrs
+            Just "stylesheet" -> lookup "href" attrs
+            _ -> Nothing)
 
           "script" -> state.jsFiles %= (\srcs -> maybe srcs (: srcs) $ lookup "src" attrs)
 
